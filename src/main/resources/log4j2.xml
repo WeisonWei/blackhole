@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="Error">
+
+  <Properties>
+    <Property name="appName">dhLog</Property>
+    <Property name="fileName">./</Property>
+    <Property name="fileGz">./log/logs/7z</Property>
+    <property name="PATTERN">%date{yyyy-MM-dd'T'HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</property>
+  </Properties>
+
+  <Appenders>
+    <Console name="console" target="SYSTEM_OUT">
+      <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
+      <PatternLayout pattern="${PATTERN}"/>
+    </Console>
+
+    <RollingRandomAccessFile name="infoFile" fileName="${fileName}/${appName}-info.log" immediateFlush="false"
+      filePattern="${fileGz}/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.${appName}-info.gz">
+      <PatternLayout pattern="${PATTERN}" />
+
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="6" modulate="true" />
+        <SizeBasedTriggeringPolicy size="50 MB"/>
+      </Policies>
+
+      <Filters>
+        <ThresholdFilter level="error" onMatch="DENY" onMismatch="NEUTRAL"/>
+        <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY" />
+      </Filters>
+
+      <DefaultRolloverStrategy max="50"/>
+    </RollingRandomAccessFile>
+
+    <RollingRandomAccessFile name="errorFile" fileName="${fileName}/${appName}-error.log" immediateFlush="false"
+      filePattern="${fileGz}/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.${appName}-error.gz">
+      <PatternLayout pattern="${PATTERN}" />
+
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="6" modulate="true" />
+        <SizeBasedTriggeringPolicy size="50 MB"/>
+      </Policies>
+
+      <Filters>
+        <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY" />
+      </Filters>
+
+      <DefaultRolloverStrategy max="50"/>
+    </RollingRandomAccessFile>
+  </Appenders>
+
+  <Loggers>
+    <AsyncRoot level="info" additivity="false">
+      <AppenderRef ref="console"/>
+      <AppenderRef ref="infoFile"/>
+      <AppenderRef ref="errorFile"/>
+    </AsyncRoot>
+  </Loggers>
+
+</Configuration>

@@ -16,8 +16,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class KafkaAuditConsumer implements InitializingBean, DisposableBean, Runnable{
-  private static final Logger logger = LoggerFactory.getLogger(KafkaAuditConsumer.class);
+public class Consumer implements InitializingBean, DisposableBean, Runnable {
+  private static final Logger logger = LoggerFactory.getLogger(Consumer.class);
   private static KafkaConsumer<String, String> consumer = null;
 
   @Value("${spring.kafka.consumer.username}")
@@ -31,7 +31,7 @@ public class KafkaAuditConsumer implements InitializingBean, DisposableBean, Run
   @Value("${spring.kafka.consumer.topic}")
   private String topic;
 
-  public void doConsumer(){
+  public void doConsumer() {
 
     logger.info("Initialization logKafkaConsumer......");
     Properties props = initPropertiesConfig();
@@ -61,8 +61,6 @@ public class KafkaAuditConsumer implements InitializingBean, DisposableBean, Run
     props.put("enable.auto.commit", "true");
     props.put("key.deserializer", StringDeserializer.class.getName());
     props.put("value.deserializer", StringDeserializer.class.getName());
-
-    //下面三个参数是关于认证的核心参数
     props.put("sasl.jaas.config", "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"" + username + "\" password=\"" + password + "\";");
     props.put("sasl.mechanism", "SCRAM-SHA-256");
     props.put("security.protocol", "SASL_PLAINTEXT");
@@ -71,7 +69,7 @@ public class KafkaAuditConsumer implements InitializingBean, DisposableBean, Run
 
   @Override
   public void run() {
-    logger.info("KafkaAuditConsumer Call run......"+this);
+    logger.info("KafkaAuditConsumer Call run......" + this);
     this.doConsumer();
   }
 

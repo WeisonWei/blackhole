@@ -1,9 +1,6 @@
-package com.bh.kafka;
+package com.bh.message.kafka;
 
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.Properties;
-
+import com.bh.message.AbstractConsumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -15,10 +12,14 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-@Component
-public class Consumer implements InitializingBean, DisposableBean, Runnable {
-  private static final Logger logger = LoggerFactory.getLogger(Consumer.class);
-  private static KafkaConsumer<String, String> consumer = null;
+import java.time.Duration;
+import java.util.Collections;
+import java.util.Properties;
+
+@Component("KfkConsumer")
+public class KfkConsumer extends AbstractConsumer implements InitializingBean, DisposableBean, Runnable {
+  private static final Logger logger = LoggerFactory.getLogger(KfkConsumer.class);
+  private KafkaConsumer<String, String> kafkaConsumer = null;
 
   @Value("${spring.kafka.consumer.username}")
   private String username;
@@ -31,27 +32,28 @@ public class Consumer implements InitializingBean, DisposableBean, Runnable {
   @Value("${spring.kafka.consumer.topic}")
   private String topic;
 
-  public void doConsumer() {
+  public KfkConsumer() {
+    super(SOURCE.KAFKA);
+  }
 
-    logger.info("Initialization logKafkaConsumer......");
+  public void doConsumer() {
+    logger.info("Initialization kfkConsumer......");
     Properties props = initPropertiesConfig();
 
-    consumer = new KafkaConsumer<String, String>(props);
-    consumer.subscribe(Arrays.asList(topic));
+    kafkaConsumer = new KafkaConsumer<>(props);
+    kafkaConsumer.subscribe(Collections.singletonList(topic));
 
     while (!Thread.currentThread().isInterrupted()) {
       try {
-        ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(50000));
-        for (ConsumerRecord<String, String> record : records) {
-          logger.info("value = {}, offset = {}", record.value(), record.offset());
+        ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(50000));
+        for (ConsumerRecord<String, String> rec : records) {
+          logger.info("value = {}, offset = {}", rec.value(), rec.offset());
         }
-
       } catch (Exception e) {
         e.printStackTrace();
         logger.error(e.getMessage());
       }
     }
-
   }
 
   private Properties initPropertiesConfig() {
@@ -69,19 +71,18 @@ public class Consumer implements InitializingBean, DisposableBean, Runnable {
 
   @Override
   public void run() {
-    logger.info("KafkaAuditConsumer Call run......" + this);
+    logger.info("KafkaAuditConsumer Call run......{}", this);
     this.doConsumer();
   }
 
   @Override
   public void destroy() throws Exception {
-    if (consumer != null) {
-      consumer.close();
+    if (kafkaConsumer != null) {
+      kafkaConsumer.close();
     }
   }
 
   @Override
   public void afterPropertiesSet() throws Exception {
-
   }
 }

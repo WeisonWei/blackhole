@@ -8,13 +8,13 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "kafka.consumer")
 @Component
 public class KfkConf {
-  private String list;
+  private String topics;
 
-  public String getList() {
-    return list;
+  public String getTopics() {
+    return topics;
   }
 
-  public void setList(String list) {
-    this.list = list;
+  public void setTopics(String topics) {
+    this.topics = topics;
   }
 }

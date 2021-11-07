@@ -2,7 +2,7 @@
 <Configuration status="Error">
 
   <Properties>
-    <Property name="appName">dhLog</Property>
+    <Property name="appName">blackhole</Property>
     <Property name="fileName">./</Property>
     <Property name="fileGz">./log/logs/7z</Property>
     <property name="PATTERN">%date{yyyy-MM-dd'T'HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</property>

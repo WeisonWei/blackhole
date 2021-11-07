@@ -1,14 +1,8 @@
-package com.bh.es.domain;
+package com.bh.es.document;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.util.List;
 
 public class LogEntry {
-  @Valid
-  @NotNull(message = "log field cannot be empty!")
-  @Size(min = 1, message = "Log list cannot be empty!")
   private List<Log> log;
 
   public List<Log> getLog() {

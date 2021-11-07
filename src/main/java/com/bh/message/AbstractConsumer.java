@@ -7,7 +7,7 @@ public abstract class AbstractConsumer {
     this.source = source;
   }
 
-  public abstract void doConsumer();
+  public abstract void doConsume();
 
   public enum SOURCE {
     KAFKA, ROCKET_MQ

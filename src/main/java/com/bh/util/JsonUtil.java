@@ -1,6 +1,7 @@
 package com.bh.util;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -8,6 +9,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +54,10 @@ public class JsonUtil {
     }
   }
 
+  public static List str2List(String json) throws JsonProcessingException {
+    return objectMapper.readValue(json, ArrayList.class);
+  }
+
   public static Map str2Map(String json) {
     try {
       return objectMapper.readValue(json, Map.class);
@@ -74,6 +80,10 @@ public class JsonUtil {
 
   public static ObjectMapper getObjectMapper() {
     return objectMapper;
+  }
+
+  public static byte[] getBytes(String json) throws JsonProcessingException {
+    return objectMapper.writeValueAsBytes(str2Map(json));
   }
 
 }

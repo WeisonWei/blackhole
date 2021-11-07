@@ -1,6 +1,6 @@
 package com.bh.message.converter;
 
-import com.bh.es.domain.Log;
+import com.bh.es.document.Log;
 import com.bh.exception.ConvertException;
 
 public interface MessageConvert {

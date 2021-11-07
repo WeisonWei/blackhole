@@ -1,6 +1,6 @@
 package com.bh.exception;
 
-public class ConvertException extends BhException {
+public class ConvertException extends BHException {
 
   public ConvertException() {
     super();

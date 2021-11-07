@@ -1,6 +1,6 @@
-package com.bh.domain;
+package com.bh.modle;
 
-public class Topics {
+public class Consumer {
   private String type;
   private String userName;
   private String passWord;

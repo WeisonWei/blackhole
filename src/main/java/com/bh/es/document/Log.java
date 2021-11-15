@@ -1,4 +1,4 @@
-package com.bh.es.domain;
+package com.bh.es.document;
 
 import java.util.Map;
 
@@ -14,9 +14,9 @@ public class Log {
   private String filepath;
   private String filename;
   private String timestamp;
-  private Map<String, String> tags;
   private String content;
   private String additional;
+  private Map<String, String> tags;
 
   public String getCluster() {
     return cluster;

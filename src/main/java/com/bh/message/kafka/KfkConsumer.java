@@ -1,9 +1,6 @@
 package com.bh.message.kafka;
 
-import java.time.Duration;
-import java.util.Collections;
-import java.util.Properties;
-
+import com.bh.modle.Consumer;
 import com.bh.message.AbstractConsumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -16,37 +13,35 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
+import java.util.Collections;
+import java.util.Properties;
+
 @Component("KfkConsumer")
 @Scope("prototype")
 public class KfkConsumer extends AbstractConsumer implements InitializingBean, DisposableBean, Runnable {
   private static final Logger logger = LoggerFactory.getLogger(KfkConsumer.class);
   private KafkaConsumer<String, String> kafkaConsumer = null;
 
-//  @Value("${spring.kafka.consumer.username}")
   private String username;
-//  @Value("${spring.kafka.consumer.password}")
   private String password;
-//  @Value("${spring.kafka.consumer.brokerList}")
   private String brokerList;
-//  @Value("${spring.kafka.consumer.groupId}")
   private String groupId;
-//  @Value("${spring.kafka.consumer.topic}")
   private String topic;
 
-
-  public void changeConsumer(String username,String password,String brokerList,String groupId,String topic) {
-    this.username = username;
-    this.password = password;
-    this.brokerList = brokerList;
-    this.groupId = groupId;
-    this.topic = topic;
+  public void updateConsumer(Consumer consumer) {
+    this.username = consumer.getUserName();
+    this.password = consumer.getPassWord();
+    this.brokerList = consumer.getBrokerList();
+    this.groupId = consumer.getGroupId();
+    this.topic = consumer.getTopic();
   }
 
   public KfkConsumer() {
     super(SOURCE.KAFKA);
   }
 
-  public void doConsumer() {
+  public void doConsume() {
     logger.info("Initialization kfkConsumer......");
     Properties props = initPropertiesConfig();
 
@@ -73,7 +68,8 @@ public class KfkConsumer extends AbstractConsumer implements InitializingBean, D
     props.put("enable.auto.commit", "true");
     props.put("key.deserializer", StringDeserializer.class.getName());
     props.put("value.deserializer", StringDeserializer.class.getName());
-    props.put("sasl.jaas.config", "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"" + username + "\" password=\"" + password + "\";");
+    props.put("sasl.jaas.config", "org.apache.kafka.common.security.scram.ScramLoginModule required " +
+        "username=\"" + username + "\" password=\"" + password + "\";");
     props.put("sasl.mechanism", "SCRAM-SHA-256");
     props.put("security.protocol", "SASL_PLAINTEXT");
     return props;
@@ -82,7 +78,7 @@ public class KfkConsumer extends AbstractConsumer implements InitializingBean, D
   @Override
   public void run() {
     logger.info("KafkaAuditConsumer Call run......{}", this);
-    this.doConsumer();
+    this.doConsume();
   }
 
   @Override

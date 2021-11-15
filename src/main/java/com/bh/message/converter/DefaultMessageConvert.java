@@ -1,6 +1,6 @@
 package com.bh.message.converter;
 
-import com.bh.es.domain.Log;
+import com.bh.es.document.Log;
 import com.bh.exception.ConvertException;
 import com.bh.util.JsonUtil;
 import com.bh.util.PropertyUtil;
@@ -43,7 +43,7 @@ public class DefaultMessageConvert implements MessageConvert {
         }
       }
 
-      Log log = null;
+      Log log;
       try {
         log = (Log) JsonUtil.map2Bean(msgMap, Log.class);
       } catch (Exception e) {

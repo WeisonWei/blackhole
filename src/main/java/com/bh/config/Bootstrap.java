@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 
 import com.bh.domain.Topics;
 import com.bh.message.kafka.KfkConsumer;
+import com.bh.modle.Consumer;
 import com.bh.util.JsonUtil;
 import com.bh.util.SpringUtil;
 import com.google.gson.JsonArray;
@@ -18,46 +19,44 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.ObjectUtils;
 
-//@ConditionalOnClass(ClassUtil.class)
+import static org.springframework.util.ObjectUtils.isEmpty;
+
 @Configuration
 public class Bootstrap {
+
   private static final Logger logger = LoggerFactory.getLogger(Bootstrap.class);
   public static final Map<String, Thread> bootstrapThreads = new HashMap<>();
 
   @Resource
-  SpringUtil springUtil;
-
-  @Autowired
-  KfkConf kfkConf;
+  ConsumerConfig consumerConfig;
 
   @PostConstruct
   public void setUp() {
-    JsonArray jsonArray = JsonParser.parseString(kfkConf.getTopics()).getAsJsonArray();
-    if (!ObjectUtils.isEmpty(jsonArray)) {
-      for (JsonElement json : jsonArray) {
-        Object consumer = SpringUtil.getBean("KfkConsumer");
-        if (consumer instanceof KfkConsumer) {
-          Topics kfkSon = JsonUtil.str2Bean(json.toString(), Topics.class);
-          Boolean b = checkListKfk(kfkSon);
-          if (!b) {
-            logger.warn("kfk list :" + kfkSon.toString());
-            continue;
-          }
-          ((KfkConsumer) consumer).changeConsumer(kfkSon.getUserName(), kfkSon.getPassWord(), kfkSon.getBrokerList(),
-              kfkSon.getGroupId(), kfkSon.getTopic());
-          Thread kfkConsumer = new Thread((KfkConsumer) consumer);
-          bootstrapThreads.put(kfkSon.getType(), kfkConsumer);
-          kfkConsumer.start();
+    String consumers = consumerConfig.getKafkaConsumers();
+    if (isEmpty(consumers)) {
+      return;
+    }
+    JsonArray confArray = JsonParser.parseString(consumers).getAsJsonArray();
+    for (JsonElement confJson : confArray) {
+      Object kfkConsumer = SpringUtil.getBean("KfkConsumer");
+      if (kfkConsumer instanceof KfkConsumer) {
+        Consumer consumer = JsonUtil.str2Bean(confJson.toString(), Consumer.class);
+        Boolean isError = checkConsumer(consumer);
+        if (!isError) {
+          logger.warn("consumer list :{}", consumer);
+          continue;
         }
+        ((KfkConsumer) kfkConsumer).updateConsumer(consumer);
+        Thread kfkConsumerThread = new Thread((KfkConsumer) kfkConsumer);
+        bootstrapThreads.put(consumer.getType(), kfkConsumerThread);
+        kfkConsumerThread.start();
       }
     }
   }
 
-  public Boolean checkListKfk(Topics kfkSon) {
-    if (ObjectUtils.isEmpty(kfkSon.getUserName()) || ObjectUtils.isEmpty(kfkSon.getBrokerList()) ||
-        ObjectUtils.isEmpty(kfkSon.getGroupId()) || ObjectUtils.isEmpty(kfkSon.getType()) || ObjectUtils.isEmpty(kfkSon.getTopic())) {
-      return false;
-    }
-    return true;
+  public Boolean checkConsumer(Consumer kfkSon) {
+    return !isEmpty(kfkSon.getUserName()) && !isEmpty(kfkSon.getBrokerList()) &&
+        !isEmpty(kfkSon.getGroupId()) && !isEmpty(kfkSon.getType()) &&
+        !isEmpty(kfkSon.getTopic());
   }
 }

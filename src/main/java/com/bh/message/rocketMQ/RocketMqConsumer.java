@@ -14,7 +14,7 @@ public class RocketMqConsumer extends AbstractConsumer implements Runnable {
   }
 
   @Override
-  public void doConsumer() {
+  public void doConsume() {
   }
 
   @Override

@@ -4,7 +4,7 @@ package com.bh.exception;
 public enum ExceptionCode {
 
   CONVERT_ERROR(10000, "Convert error"),
-  CONNECTION_ERROR(10001, "Convert error"),
+  CONNECTION_ERROR(10001, "Connection error"),
 
   //default
   DEFAULT(9999, "Internal System Error");

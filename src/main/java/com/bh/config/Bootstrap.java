@@ -1,5 +1,11 @@
 package com.bh.config;
 
+import java.util.HashMap;
+import java.util.Map;
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+
+import com.bh.domain.Topics;
 import com.bh.message.kafka.KfkConsumer;
 import com.bh.modle.Consumer;
 import com.bh.util.JsonUtil;
@@ -9,12 +15,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.util.ObjectUtils;
 
 import static org.springframework.util.ObjectUtils.isEmpty;
 

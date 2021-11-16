@@ -3,6 +3,7 @@ package com.bh.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.bh.es.document.Log;
 import com.bh.util.JsonUtil;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
@@ -80,6 +81,18 @@ public class ElasticSearchService {
     List list = JsonUtil.str2List(documents);
     for (Object obj : list) {
       byte[] bytes = JsonUtil.toJson(obj).getBytes();
+      IndexRequest request = new IndexRequest(index).source(bytes, XContentType.JSON);
+      bulkRequest.add(request);
+    }
+    BulkResponse bulkResponse = restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+    RestStatus restStatus = bulkResponse.status();
+    return 200 == restStatus.getStatus();
+  }
+
+  public boolean addDocs(String index, List<Log> logs) throws IOException {
+    BulkRequest bulkRequest = new BulkRequest();
+    for (Log log : logs) {
+      byte[] bytes = JsonUtil.toJson(log).getBytes();
       IndexRequest request = new IndexRequest(index).source(bytes, XContentType.JSON);
       bulkRequest.add(request);
     }

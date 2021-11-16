@@ -5,8 +5,8 @@ import lombok.Getter;
 
 public class Constant {
 
-  public static String ES_INDEX_FIELDS_CONFIG_FILE = "es.index";
-  public static String TOPIC_SERVICE_FIELDS_CONFIG_FILE = "service-fields.properties";
+  public static String ES_LOG_INDEX_FIELDS = "log.index";
+  public static String SERVICE_LOG_FIELDS = "service-log-fields";
 
   public enum HTTPMethod {
     POST("POST"), GET("GET"), PUT("PUT"), DELETE("DELETE"), HEAD("HEAD");

@@ -1,6 +1,12 @@
 package com.bh.es.document;
 
+import com.bh.modle.mq.Host;
+import com.bh.modle.mq.Message;
+import com.bh.util.DateUtil;
+
 import java.util.Map;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class Log {
   private String cluster;
@@ -15,6 +21,10 @@ public class Log {
   private String filename;
   private String timestamp;
   private String content;
+  private String machineRoom;
+  private String writeTimestamp;
+  private String processName;
+  private String type;
   private String additional;
   private Map<String, String> tags;
 
@@ -40,6 +50,14 @@ public class Log {
 
   public void setVersion(String version) {
     this.version = version;
+  }
+
+  public String getIp() {
+    return ip;
+  }
+
+  public void setIp(String ip) {
+    this.ip = ip;
   }
 
   public String getAppId() {
@@ -106,20 +124,36 @@ public class Log {
     this.content = content;
   }
 
-  public String getIp() {
-    return ip;
+  public String getMachineRoom() {
+    return machineRoom;
   }
 
-  public void setIp(String ip) {
-    this.ip = ip;
+  public void setMachineRoom(String machineRoom) {
+    this.machineRoom = machineRoom;
   }
 
-  public Map<String, String> getTags() {
-    return tags;
+  public String getWriteTimestamp() {
+    return writeTimestamp;
   }
 
-  public void setTags(Map<String, String> tags) {
-    this.tags = tags;
+  public void setWriteTimestamp(String writeTimestamp) {
+    this.writeTimestamp = writeTimestamp;
+  }
+
+  public String getProcessName() {
+    return processName;
+  }
+
+  public void setProcessName(String processName) {
+    this.processName = processName;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
   }
 
   public String getAdditional() {
@@ -130,22 +164,59 @@ public class Log {
     this.additional = additional;
   }
 
+  public Map<String, String> getTags() {
+    return tags;
+  }
+
+  public void setTags(Map<String, String> tags) {
+    this.tags = tags;
+  }
+
+  public static Log mapTo(Message message) {
+    Log log = new Log();
+    log.setContent(message.getMessage());
+    String timestamp = message.getTimestamp();
+    if (!isBlank(timestamp) && timestamp.contains("Z")) {
+      timestamp = String.valueOf(DateUtil.formatUTCToTimestamp(timestamp));
+    }
+    log.setTimestamp(timestamp);
+    if (message.getHost() != null) {
+      Host host = message.getHost();
+      if (host.getIp() != null && !host.getIp().isEmpty()) {
+        log.setIp(host.getIp().get(0));
+      }
+    }
+    if (message.getFields() != null && !message.getFields().isEmpty()) {
+      log.setTags(message.getFields());
+    }
+
+    if (message.getLog() != null && message.getLog().getFile() != null) {
+      log.setFilepath(message.getLog().getFile().getPath());
+    }
+    return log;
+  }
+
   @Override
   public String toString() {
     return "Log{" +
         "cluster='" + cluster + '\'' +
-        ", sevice='" + service + '\'' +
+        ", service='" + service + '\'' +
         ", version='" + version + '\'' +
         ", ip='" + ip + '\'' +
-        ", appID='" + appId + '\'' +
+        ", appId='" + appId + '\'' +
         ", erp='" + erp + '\'' +
         ", logLevel='" + logLevel + '\'' +
-        ", podname='" + podName + '\'' +
+        ", podName='" + podName + '\'' +
         ", filepath='" + filepath + '\'' +
         ", filename='" + filename + '\'' +
         ", timestamp='" + timestamp + '\'' +
         ", content='" + content + '\'' +
+        ", machineRoom='" + machineRoom + '\'' +
+        ", writeTimestamp='" + writeTimestamp + '\'' +
+        ", processName='" + processName + '\'' +
+        ", type='" + type + '\'' +
         ", additional='" + additional + '\'' +
+        ", tags=" + tags +
         '}';
   }
 }

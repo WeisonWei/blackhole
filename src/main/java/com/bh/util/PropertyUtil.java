@@ -10,23 +10,23 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import static com.bh.constant.Constant.ES_INDEX_FIELDS_CONFIG_FILE;
-import static com.bh.constant.Constant.TOPIC_SERVICE_FIELDS_CONFIG_FILE;
+import static com.bh.constant.Constant.ES_LOG_INDEX_FIELDS;
+import static com.bh.constant.Constant.SERVICE_LOG_FIELDS;
 
 public class PropertyUtil {
   private static final Logger logger = LoggerFactory.getLogger(PropertyUtil.class);
 
-  public static String ES_FIELDS;
-  private static Properties properties;
-  private static final String propertiesUrl = TOPIC_SERVICE_FIELDS_CONFIG_FILE;
   private static File file;
+  private static Properties properties;
+  private static final String propertiesUrl = SERVICE_LOG_FIELDS;
 
+  public static String ES_FIELDS;
 
   static {
     ClassPathResource classPathResource = new ClassPathResource(propertiesUrl);
     try {
       file = classPathResource.getFile();
-      ES_FIELDS = getProperty(ES_INDEX_FIELDS_CONFIG_FILE);
+      ES_FIELDS = getProperty(ES_LOG_INDEX_FIELDS);
     } catch (IOException e) {
       e.printStackTrace();
     }

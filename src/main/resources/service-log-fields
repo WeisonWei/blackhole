@@ -1,2 +1,2 @@
-es-index=cluster,service,version,ip,appId,erp,logLevel,podName,filepath,filename,timestamp;
+log-index=cluster,service,version,ip,appId,erp,logLevel,podName,filepath,filename,timestamp;
 topicId-serviceId=cluster,service,version,ip,appId,erp,logLevel,podName,filepath,filename,timestamp,a,b,c;

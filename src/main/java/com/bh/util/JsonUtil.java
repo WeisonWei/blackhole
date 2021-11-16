@@ -3,6 +3,7 @@ package com.bh.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -56,6 +57,11 @@ public class JsonUtil {
 
   public static List str2List(String json) throws JsonProcessingException {
     return objectMapper.readValue(json, ArrayList.class);
+  }
+
+  public static List str2ListByClass(String jsonArray, Class<?> elementClasses) throws JsonProcessingException {
+    JavaType javaType = objectMapper.getTypeFactory().constructParametricType(ArrayList.class, elementClasses);
+    return objectMapper.readValue(jsonArray, javaType);
   }
 
   public static Map str2Map(String json) {

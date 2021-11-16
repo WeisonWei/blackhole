@@ -2,7 +2,6 @@ package com.bh.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -10,6 +9,8 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class DateUtil {
   private static final Logger log = LoggerFactory.getLogger(DateUtil.class);
@@ -37,7 +38,7 @@ public class DateUtil {
     Calendar c = Calendar.getInstance();
     long timestamp = c.getTime().getTime();
     try {
-      if (!StringUtils.isEmpty(time)) {
+      if (!isBlank(time)) {
         time = time.replaceAll("\\s+", "Z");
         time = time.substring(0, time.lastIndexOf(".") + 4);
         log.debug(time);

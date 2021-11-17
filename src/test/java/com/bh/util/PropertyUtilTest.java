@@ -16,7 +16,7 @@ public class PropertyUtilTest {
   public void readProperties() throws Exception {
     String property = PropertyUtil.getProperty("es-index");
     logger.info("es-index-fields--->", property);
-    Assertions.assertEquals(property, "cluster,service,version,ip,appId,erp,logLevel,podName,filepath,filename,timestamp");
+    Assertions.assertEquals(property, "cluster,service,version,ip,appId,erp,logLevel,podName,filepath,filename,timestamp;");
   }
 
   @Test
@@ -26,7 +26,6 @@ public class PropertyUtilTest {
     String property = PropertyUtil.getProperty("es");
     logger.info("es-index-fields--->", property);
     Assertions.assertEquals(property, "456");
-
   }
 
 }

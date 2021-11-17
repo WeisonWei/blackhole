@@ -22,19 +22,19 @@ docker run -d --name zookeeper -p 2181:2181 -v /etc/localtime:/etc/localtime wur
 ## 4 kafka
 `
 docker pull wurstmeister/kafka:2.11-0.11.0.3
-docker run  -d --name kafka -p 9092:9092 -e KAFKA_BROKER_ID=0 -e KAFKA_ZOOKEEPER_CONNECT=192.168.250.1:2181 -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://192.168.250.1:9092 -e KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092 -t wurstmeister/kafka
+docker run  -d --name kafka -p 9092:9092 -e KAFKA_BROKER_ID=0 -e KAFKA_ZOOKEEPER_CONNECT=localhost:2181 -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092 -e KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092 -t wurstmeister/kafka
 `
 
 ### 4.1 topic
 `
 docker exec -it kafka /bin/bash
 cd /opt/kafka_*
-bin/kafka-topics.sh --create --zookeeper 192.168.250.1:2181 --replication-factor 1 --partitions 1 --topic bhlog
+bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic bhlog
 `
 ### 4.2 producer
-`bin/kafka-console-producer.sh --broker-list 192.168.250.1:9092 --topic uvsLog`
+`bin/kafka-console-producer.sh --broker-list localhost:9092 --topic uvsLog`
 ### 4.3 consumer
-`bin/kafka-console-consumer.sh --bootstrap-server 192.168.250.1:9092 --topic bhlog --from-beginning` 
+`bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic bhlog --from-beginning` 
 
 ## 5 mysql
 `docker pull mysql`

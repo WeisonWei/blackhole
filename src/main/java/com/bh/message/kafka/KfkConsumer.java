@@ -1,78 +1,79 @@
 package com.bh.message.kafka;
 
-import com.bh.modle.Consumer;
+import com.bh.es.document.Log;
 import com.bh.message.AbstractConsumer;
+import com.bh.message.converter.MessageConvert;
+import com.bh.service.ElasticSearchService;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
-@Component("KfkConsumer")
-@Scope("prototype")
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 public class KfkConsumer extends AbstractConsumer implements InitializingBean, DisposableBean, Runnable {
   private static final Logger logger = LoggerFactory.getLogger(KfkConsumer.class);
   private KafkaConsumer<String, String> kafkaConsumer = null;
 
-  private String username;
-  private String password;
-  private String brokerList;
-  private String groupId;
+  private Properties props;
   private String topic;
-
-  public void updateConsumer(Consumer consumer) {
-    this.username = consumer.getUserName();
-    this.password = consumer.getPassWord();
-    this.brokerList = consumer.getBrokerList();
-    this.groupId = consumer.getGroupId();
-    this.topic = consumer.getTopic();
-  }
+  private ElasticSearchService es;
+  private MessageConvert messageConvert;
 
   public KfkConsumer() {
     super(SOURCE.KAFKA);
   }
 
+  public KfkConsumer(SOURCE source, Properties props,
+                     String topic, ElasticSearchService es,
+                     MessageConvert messageConvert) {
+    super(source);
+    this.kafkaConsumer = new KafkaConsumer<>(props);
+    this.props = props;
+    this.topic = topic;
+    this.es = es;
+    this.messageConvert = messageConvert;
+  }
+
   public void doConsume() {
     logger.info("Initialization kfkConsumer......");
-    Properties props = initPropertiesConfig();
-
-    kafkaConsumer = new KafkaConsumer<>(props);
     kafkaConsumer.subscribe(Collections.singletonList(topic));
 
     while (!Thread.currentThread().isInterrupted()) {
       try {
         ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(50000));
-        for (ConsumerRecord<String, String> rec : records) {
-          logger.info("value = {}, offset = {}", rec.value(), rec.offset());
+        for (ConsumerRecord<String, String> record : records) {
+          String msg = record.value();
+          if (isNotBlank(msg)) {
+            if (msg.charAt(0) != '[') {
+              logger.warn("Json syntax error,support for Array. json{}", msg);
+              break;
+            }
+          }
+          Pair<String, List<Log>> logPair = messageConvert.convert(record);
+          if (logPair == null) {
+            logger.debug("message convert failed");
+            return;
+          }
+          logger.debug("index:{} insert documents:{}", logPair.getLeft(), logPair.getRight());
+          boolean success = es.addDocs(logPair.getLeft(), logPair.getRight());
+          logger.debug("index:{} insert {} documents, result: {}", logPair.getLeft(),
+              logPair.getRight().size(), success);
         }
       } catch (Exception e) {
         e.printStackTrace();
         logger.error(e.getMessage());
       }
     }
-  }
-
-  private Properties initPropertiesConfig() {
-    Properties props = new Properties();
-    props.put("bootstrap.servers", brokerList);
-    props.put("group.id", groupId);
-    props.put("enable.auto.commit", "true");
-    props.put("key.deserializer", StringDeserializer.class.getName());
-    props.put("value.deserializer", StringDeserializer.class.getName());
-    props.put("sasl.jaas.config", "org.apache.kafka.common.security.scram.ScramLoginModule required " +
-        "username=\"" + username + "\" password=\"" + password + "\";");
-    props.put("sasl.mechanism", "SCRAM-SHA-256");
-    props.put("security.protocol", "SASL_PLAINTEXT");
-    return props;
   }
 
   @Override

@@ -1,7 +1,7 @@
 package com.bh.es.document;
 
-import com.bh.modle.mq.Host;
-import com.bh.modle.mq.Message;
+import com.bh.model.mq.Host;
+import com.bh.model.mq.Message;
 import com.bh.util.DateUtil;
 
 import java.util.Map;

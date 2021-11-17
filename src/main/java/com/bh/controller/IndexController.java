@@ -1,6 +1,6 @@
 package com.bh.controller;
 
-import com.bh.modle.Response;
+import com.bh.model.Response;
 import com.bh.service.ElasticSearchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

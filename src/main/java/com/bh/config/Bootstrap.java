@@ -2,7 +2,7 @@ package com.bh.config;
 
 import com.bh.message.converter.MessageConvert;
 import com.bh.message.kafka.KfkConsumer;
-import com.bh.modle.Consumer;
+import com.bh.model.Consumer;
 import com.bh.service.ElasticSearchService;
 import com.bh.util.JsonUtil;
 import com.bh.util.SpringUtil;

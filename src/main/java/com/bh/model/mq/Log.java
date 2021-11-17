@@ -1,4 +1,4 @@
-package com.bh.modle.mq;
+package com.bh.model.mq;
 
 public class Log {
 

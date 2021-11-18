@@ -1,4 +1,4 @@
-package com.bh.modle;
+package com.bh.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

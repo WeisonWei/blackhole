@@ -59,12 +59,14 @@ public class KfkConsumer extends AbstractConsumer implements InitializingBean, D
               break;
             }
           }
+          //convert
           Pair<String, List<Log>> logPair = messageConvert.convert(record);
           if (logPair == null) {
             logger.debug("message convert failed");
             return;
           }
           logger.debug("index:{} insert documents:{}", logPair.getLeft(), logPair.getRight());
+          //todo move indexCache to add up ,add locked
           boolean success = es.addDocs(logPair.getLeft(), logPair.getRight());
           logger.debug("index:{} insert {} documents, result: {}", logPair.getLeft(),
               logPair.getRight().size(), success);

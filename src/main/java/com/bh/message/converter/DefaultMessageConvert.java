@@ -30,26 +30,33 @@ public class DefaultMessageConvert implements MessageConvert {
 
   public static final Set<String> INDEXES = ConcurrentHashMap.newKeySet();
 
+
+  /**
+   * todo
+   * @param message
+   * @return
+   */
   @Override
   public Pair<String, List<Log>> convert(ConsumerRecord<String, String> message)
       throws ConvertException, JsonProcessingException {
     String value = message.value();
-    List<Log> logs = new ArrayList<>();
     if (isFieldsConfigEnable || isBlank(value)) {
-      return mapByConfig(value, logs);
+      return mapByConfig(value);
     } else {
-      return mapByBean(message, value, logs);
+      return mapByBean(value);
     }
   }
 
-  private Pair<String, List<Log>> mapByBean(ConsumerRecord<String, String> message, String value, List<Log> logs)
+  private Pair<String, List<Log>> mapByBean(String value)
       throws JsonProcessingException {
+    List<Log> logs = new ArrayList<>();
     List<Message> messages = JsonUtil.str2ListByClass(value, Message.class);
     String index = null;
     for (Message msg : messages) {
       String logContent = msg.getMessage();
       Map<String, String> fields = msg.getFields();
       String serviceName = fields.get("process_name");
+      //todo spilt time is error
       if (logContent.length() >= 11) {
         String logDate = logContent.substring(0, 11);
         //TODO is index different each time?
@@ -63,6 +70,7 @@ public class DefaultMessageConvert implements MessageConvert {
 
       if (isBlank(msg.getMessage()) || msg.getHost() == null
           || msg.getFields() == null || msg.getLog() == null) {
+        //todo add log
         continue;
       }
       Log log = Log.mapTo(msg);
@@ -71,8 +79,9 @@ public class DefaultMessageConvert implements MessageConvert {
     return Pair.of(index, logs);
   }
 
-  private Pair<String, List<Log>> mapByConfig(String value, List<Log> logs)
+  private Pair<String, List<Log>> mapByConfig(String value)
       throws ConvertException {
+    List<Log> logs = new ArrayList<>();
     Map<String, String> msgMap = JsonUtil.str2Map(value);
     if (msgMap.containsKey("cluster") && value.contains("service")) {
       String cluster = msgMap.get("cluster");

@@ -85,8 +85,13 @@ public class ElasticSearchService {
       bulkRequest.add(request);
     }
     BulkResponse bulkResponse = restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
-    RestStatus restStatus = bulkResponse.status();
-    return 200 == restStatus.getStatus();
+    if (bulkResponse.status().getStatus() == 200) {
+      if (bulkResponse.hasFailures()) {
+        logger.error(bulkResponse.buildFailureMessage());
+        return false;
+      }
+    }
+    return true;
   }
 
   public boolean addDocs(String index, List<Log> logs) throws IOException {
@@ -97,8 +102,13 @@ public class ElasticSearchService {
       bulkRequest.add(request);
     }
     BulkResponse bulkResponse = restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
-    RestStatus restStatus = bulkResponse.status();
-    return 200 == restStatus.getStatus();
+    if (bulkResponse.status().getStatus() == 200) {
+      if (bulkResponse.hasFailures()) {
+        logger.error(bulkResponse.buildFailureMessage());
+        return false;
+      }
+    }
+    return true;
   }
 
   public String getDoc(String index, String id) throws IOException {
